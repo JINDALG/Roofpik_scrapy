@@ -26,11 +26,11 @@ class acres99Spider(scrapy.Spider):
             abs_url = 'http://www.magicbricks.com/' + url
             yield scrapy.Request(abs_url, callback=self.parse_property_info)
 
-        # self.page +=1  
-        # next_url = (response.url).split('/')
-        # next_url[-1] = "Page-" + str(self.page)
-        # next_url = '/'.join(next_url) # url of next page
-        # yield scrapy.Request(next_url, callback=self.parse)
+        self.page +=1  
+        next_url = (response.url).split('/')
+        next_url[-1] = "Page-" + str(self.page)
+        next_url = '/'.join(next_url) # url of next page
+        yield scrapy.Request(next_url, callback=self.parse)
 
     def parse_property_info(self, response):    
         # this function scrpaes info off the property page using xpaths
@@ -116,7 +116,8 @@ class acres99Spider(scrapy.Spider):
                         pass
 
                     try :
-                        booking_info = ''.join(data.xpath('div[@class="dataVal"]/div//text()').extract()).replace('\n','')
+                        booking_info = ''.join(data.xpath('div[@class="dataVal"]/div//text()').extract()).replace('\n',' ')
+                        booking_info  = (''.join([i if ord(i) < 128 else ' ' for i in booking_info])).strip()
                     except :
                         pass
 
@@ -176,7 +177,7 @@ class acres99Spider(scrapy.Spider):
 
                 if "Furnish" in label:
                     try :
-                        furnishing = (data.xpath('div[@class="dataVal"]//text()').extract()).strip()
+                        furnishing = ''.join(data.xpath('div[@class="dataVal"]//text()').extract()).strip()
                     except :
                         pass
 
@@ -271,8 +272,4 @@ class acres99Spider(scrapy.Spider):
 
         #print '\n\n\n\n\n\n', trending_table , '\n\n\n\n\n\n\n\n'
         #for key in item:    if(item[key] == ''):        item[key] = None
-        print response.url
-        print "\n"
-        pprint(item)
-        input()
         yield item
