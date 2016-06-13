@@ -5,12 +5,7 @@ class DBHandler:
 		self.db = MySQLdb.connect("localhost", "root", "123456", "99acres")
 		self.cur = self.db.cursor()
 
-		self.insert_values  = 'INSERT INTO Data (Price, PricePerUnit, Availability, SuperBuiltupArea,\
-		BuiltupArea, CarpetArea, address, Location,  Washroom,  Description, PostedBy, PostingDate, \
-		ProjectName, Bedrooms, Views, Searched, URL, PROPERTYCODE ,BookingAmount , Deposit,\
-		 GatedCommunity , PowerBackup ,BookingINFO, AdditionalRooms, PropertyInfo , maintainance, \
-		 Furnishing, City)\
-		 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+		self.insert_values  = 'INSERT INTO Data (Price, PricePerUnit, Availability, SuperBuiltupArea, BuiltupArea, CarpetArea, address,Location,  Washroom,  Description, PostedBy, PostingDate, ProjectName, Bedrooms, Views, Searched, URL, PROPERTYCODE ,BookingAmount , Deposit,GatedCommunity , PowerBackup ,BookingINFO, AdditionalRooms, PropertyInfo , maintainance, Furnishing, City) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
 		self.insert_question = 'INSERT INTO Questions (Question) VALUES (%s)'
 		self.insert_trend = 'INSERT INTO Trends (area, two_bedroom, three_bedroom, four_bedroom) VALUES (%s, %s, %s, %s)'
 		

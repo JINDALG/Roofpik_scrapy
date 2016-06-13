@@ -61,7 +61,7 @@ class acres99Spider(scrapy.Spider):
         except:
             pass
 
-        superBuiltupArea = builtupArea = carpetArea = ''
+        superBuiltupArea = builtupArea = carpetArea = -1.0
         try:
             area = ''.join((area1 + area2 + area3 + area4).replace(' ', '' ).split(':')).replace('\n', '').lower()
             area = area.replace('-', '').replace('.00', '').replace(',', '')
