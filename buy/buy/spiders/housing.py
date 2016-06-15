@@ -17,7 +17,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 class housing(scrapy.Spider):
 	name = "housing"
-	allowed_domains = ['housing.com']
+	allowed_domains = ['www.housing.com']
 
 	def __init__(self, filename=None):
 		self.driver = webdriver.Firefox()
@@ -111,7 +111,8 @@ class housing(scrapy.Spider):
 			pass
 
 
-		SuperBuiltupArea = launch_date = CarpetArea = '' 
+		launch_date = CarpetArea  = posted_on = '' 
+		SuperBuiltupArea = 0.0
 		try :
 			overview = response.xpath('//div[@id="overview-card"]//span[@class="entity"]')
 			try :
@@ -298,3 +299,4 @@ class housing(scrapy.Spider):
 
 
 		yield item
+		input()
