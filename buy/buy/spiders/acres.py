@@ -1,6 +1,6 @@
 import scrapy
 from buy.items import BuyItem
-import start_url_99acres
+import start_url_acres
 from pprint import pprint
 from month import find_month
 from selenium import webdriver
@@ -19,14 +19,14 @@ class acres(scrapy.Spider):
 	allowed_domains = ['www.99acres.com']
 
 	def __init__(self, filename=None):
-		self.driver = webdriver.Firefox()
+		self.driver = webdriver.Chrome()
 		dispatcher.connect(self.spider_closed, signals.spider_closed)
 
 	def spider_closed(self,spider):
 		self.driver.close()
 
 	def start_requests(self):
-		urls = start_url_99acres.start()
+		urls = start_url_acres.start()
 		for url in urls:
 			yield scrapy.Request(url, self.parse)
 
@@ -44,6 +44,7 @@ class acres(scrapy.Spider):
 	def parse_property_info(self, response):
 		item = BuyItem()
 		self.driver.get(response.url)
+		input()
 		try:
 			WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//div[@class="npPrice"]//text()')))
 		except TimeoutException:
@@ -59,7 +60,7 @@ class acres(scrapy.Spider):
 			price = float(full_price.split(',')[3])
 			if 'Cr' in full_price :
 				price *= 10000000
-			if "Lacs" in full_price :
+			if "Lac" in full_price :
 				price *= 100000
 		except :
 			pass
@@ -119,8 +120,14 @@ class acres(scrapy.Spider):
 			except:
 				pass
 		try :
-			min_area = float(response.xpath('//div[@class="npAreaPrice"]/span[1]/text()').extract())
-			max_area = min_area
+			temp = ''.join(response.xpath('//div[@class="npAreaPrice"]/span[1]/text()').extract())
+			temp = temp.split()
+			temp = [float(i) for i in temp if i.isdigit()]
+			try :
+				min_area = temp[0]
+				max_area = temp[1]
+			except :
+				max_area = min_area
 		except :
 			pass
 

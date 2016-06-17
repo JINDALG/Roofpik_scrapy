@@ -67,7 +67,6 @@ class Result(scrapy.Spider):
         sent = (self.text)
         all_permut = list(itertools.permutations(sent))
         pprint(all_permut)
-        input()
 
         for permut in all_permut:
             text = '+'.join(permut)
@@ -78,7 +77,7 @@ class Result(scrapy.Spider):
             except TimeoutException:
                 return
             resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
-
+            input()
             urls = resp.xpath('//h3//a/@href').extract()
             pprint(urls)
             for url in urls :
@@ -92,7 +91,8 @@ class Result(scrapy.Spider):
         try:
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//img[@src]')))
         except TimeoutException:
-            pass
+            yield scrapy.Request(response.url, callback = self.parse_page)
+            return
         resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
 
         temp['p'] = ((('abcd'.join(resp.xpath('//p//text()').extract())).replace('\n','').replace('\t','')).encode('utf8')).split('abcd')

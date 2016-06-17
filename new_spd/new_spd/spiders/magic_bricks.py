@@ -19,7 +19,7 @@ class acres99Spider(scrapy.Spider):
 
     def parse(self, response):
         urls = response.xpath('//div[@class="srpAnchor"]/p/a/@href').extract() 
-        urls=['http://www.magicbricks.com/propertyDetails/4-BHK-4000-Sq-ft-Multistorey-Apartment-FOR-Rent-DLF-City-Phase-5-in-Gurgaon&id=4d423230333033343631?from=search']
+        #urls=['http://www.magicbricks.com/propertyDetails/4-BHK-4000-Sq-ft-Multistorey-Apartment-FOR-Rent-DLF-City-Phase-5-in-Gurgaon&id=4d423230333033343631?from=search']
         if len(urls) == 0:
             return
         for url in urls:

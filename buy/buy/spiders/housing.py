@@ -20,7 +20,7 @@ class housing(scrapy.Spider):
 	allowed_domains = ['www.housing.com']
 
 	def __init__(self, filename=None):
-		self.driver = webdriver.Firefox()
+		self.driver = webdriver.Chrome()
 		dispatcher.connect(self.spider_closed, signals.spider_closed)
 
 	def spider_closed(self,spider):
@@ -299,4 +299,3 @@ class housing(scrapy.Spider):
 
 
 		yield item
-		input()
