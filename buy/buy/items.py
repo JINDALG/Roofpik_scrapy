@@ -32,4 +32,6 @@ class BuyItem(scrapy.Item):
     bedrooms = scrapy.Field()
     bathrooms = scrapy.Field()
     is_resale = scrapy.Field()  
-    posted_on = scrapy.Field()  	
+    posted_on = scrapy.Field()
+    code = scrapy.Field()  	
+    description = scrapy.Field()
