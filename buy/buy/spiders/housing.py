@@ -195,7 +195,7 @@ class housing(scrapy.Spider):
 						if "Cr" in full_rate:
 							rate *= 10000000
 
-						more_info += [bhk,size,rate]
+						more_info += [(bhk,size,rate)]
 				except:
 					pass
 		except :
