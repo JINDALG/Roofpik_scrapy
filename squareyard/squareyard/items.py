@@ -10,6 +10,7 @@ import scrapy
 class SquareyardItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    name = scrapy.Field()
     min_price = scrapy.Field()
     max_price = scrapy.Field()
     price_per_sqft = scrapy.Field()

@@ -64,7 +64,7 @@ class squareyards(scrapy.Spider):
 
         min_price = max_price = price_per_sqft  = min_area = max_area  =  0
         is_price_fix = 1
-        description =  code = address = city = location =  status = unit_type = property_type  =""
+        name = description =  code = address = city = location =  status = unit_type = property_type  =""
         amenities ={}
         speciality = {}
         wow_factors =  {}
@@ -76,6 +76,11 @@ class squareyards(scrapy.Spider):
         except TimeoutException:
             return
         resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8')
+
+        try :
+            name = ''.join(resp.xpath('//h1[@itemprop="name"]//text()').extract())
+        except :
+            pass
 
         try :
             full_price = ''.join(resp.xpath('//span[@class="price-detail-txt"]//text()').extract())
@@ -236,6 +241,7 @@ class squareyards(scrapy.Spider):
         except :
             pass
 
+        item['name'] = name.encode('utf8')
         item['min_price'] = min_price
         item['max_price'] = max_price
         item['price_per_sqft'] = price_per_sqft
@@ -256,17 +262,16 @@ class squareyards(scrapy.Spider):
         item['connecting_road'] = connection
         item['wow_factors'] = wow_factors
         item['more_info'] = {}
-        # urls = resp.xpath('//div[@class="bhkDetails"]//a/@href').extract()
 
-        # for url in urls:
-        #     abs_url = 'http://www.squareyards.com' + url
-        #     new_info = (url.split('/')[-2]).encode('utf8')
-        #     item['more_info'][new_info] = self.parse_deep_info(abs_url)
+        urls = resp.xpath('//div[@class="bhkDetails"]//a/@href').extract()
+        for url in urls:
+            abs_url = 'http://www.squareyards.com' + url
+            self.parse_deep_info(abs_url, item['more_info'])
         
         yield item
         input()
 
-    def parse_deep_info(self, abs_url):
+    def parse_deep_info(self, abs_url, main_item):
         item = {}
         self.driver.get(abs_url)
         try:
@@ -276,6 +281,18 @@ class squareyards(scrapy.Spider):
         resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8')
 
         balconies =min_price = max_price = living_area  = bedrooms = bathrooms = kitchens = servent_rooms = carpet_area = built_up_area =  0
+        code = name = ""
+        try :
+            code = ((response.url).split('/')[-2]).encode('utf8')
+        except :
+            pass
+
+        try :
+            name = (''.join(resp.xpath('//h1[@itemprop="name"]//text()').extract())).split()
+            name = ''.join([name[0],name[1]])
+        except :
+            pass
+
         try :
             full_price = ''.join(resp.xpath('//span[@itemprop="minPrice"]//text()').extract())
             min_price = float(full_price.split()[0])   
@@ -372,5 +389,9 @@ class squareyards(scrapy.Spider):
         item['servent_room'] = servent_rooms
         item['living_area'] = living_area
         item['kitchen'] = kitchens
+        item['code'] = code.encode('utf8')
 
-        return item
+        if name in main_item:
+            main_item[name] += [item]
+        else :
+            main_item[name] = [item]
