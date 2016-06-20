@@ -80,7 +80,7 @@ class Result(scrapy.Spider):
             yield scrapy.Request(next_url, callback = self.parse, dont_filter = True)
 
     def filter(self, url):
-        banned = ['magicbricks.com','99acres.com','commonfloor.com','www.makaan.com','']
+        banned = ['http://99acres.com/','http://commonfloor.com/','http://www.makaan.com/', 'http://www.affordablehomesindia.com/', 'http://www.magicbricks.com/', 'http://www.gurgaonnewlaunch.in/', 'http://www.gurgaonprojects.co.in/', 'http://www.godrejproperties.com/', 'http://www.commonfloor.com/', 'http://www.newprojectsingurgaon.in/', 'http://newlaunchgurgaon.in/', 'http://www.housing.com/', 'http://www.oneindiabullsgurgaon.co.in/', 'http://www.tatalavida113.in/', 'http://www.assetbulls.com/', 'http://www.makaan.com/', 'http://supertechlimited.com/', 'http://thecentercourt.co.in/', 'http://www.saanverdante.com/', 'http://www.hometrust.in/', 'http://www.windchants.in/', 'http://www.quikr.com/', 'http://www.unistar.in/', 'http://www.indiabullsone09gurgaon.in/', 'http://www.proptiger.com/']
         parsed_uri = urlparse.urlparse(url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         print domain
