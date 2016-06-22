@@ -1,135 +1,134 @@
 import os
 import scrapy
-from selenium.webdriver.common.action_chains import ActionChains
-from scrapy import signals
-from scrapy.xlib.pydispatch import dispatcher
-from scrapy.http import TextResponse
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-import time
-from Tkinter import *
 from pprint import pprint
 import csv
-import urlparse
+import re
+import datetime
+from firebase import firebase
+from multiprocessing import Process
 
 
 class Result(scrapy.Spider):
+    rank = 0
     name = "trends"
+    city = "Gurgaon"
     text = None
     allowed_domains = ['google.co.in']
     start_urls = ['https://www.google.co.in']
     page = 0
-
-    def fetch(self,entries):
-        sroll = entries[0]
-        self.text = '+'.join((entries[0][1].get()).split())
-        self.root.destroy()
-
-    def makeform(self,fields):
-       entries = []
-       for field in fields:
-          row = Frame(self.root)
-          lab = Label(row, width=50, text=field, anchor='w')
-          ent = Entry(row)
-          row.pack(side=TOP, fill=X, padx=5, pady=10)
-          lab.pack(side=TOP)
-          ent.pack(side=TOP, expand=YES, fill=X , pady=10)
-          entries.append((field, ent))
-       return entries
-
     def __init__(self, filename=None):
-        fields = 'Googling Text',
-        self.root = Tk()
-        self.root.title('Roofpik')
-        self.root.geometry("200x200")
-        ents = self.makeform( fields)
-        self.root.bind('<Return>', (lambda event, e=ents: self.fetch(e)))   
-        b1 = Button(self.root, text='submit',
-                command=(lambda e=ents: self.fetch(e)))
-        b1.pack(side=TOP, padx=5, pady=5)
-        self.root.mainloop()
-        self.driver = webdriver.Chrome()
-        # self.driver = webdriver.Firefox()
-        dispatcher.connect(self.spider_closed, signals.spider_closed)
+        self.firebases = firebase.FirebaseApplication("https://trends-4b774.firebaseio.com/", None)
+        pass
+        # self.driver = webdriver.Chrome()
+        # # self.driver = webdriver.Firefox()
+        # dispatcher.connect(self.spider_closed, signals.spider_closed)
 
-    def spider_closed(self, spider):
-        self.driver.close()
+    # def spider_closed(self, spider):
+    #     self.driver.close()
 
 
     def parse(self, response):
-        url = 'https://www.google.co.in/?gfe_rd=cr&ei=cUFiV5C4Lu-q8weqqI-oAQ&gws_rd=ssl#q=%s&start=%d' %(self.text,self.page)
-        self.driver.get(url)
-        try:
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//h3//a')))
-        except TimeoutException:
-            return
-        resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
-        urls = resp.xpath('//h3//a/@href').extract()
+        self.text= "Show me newly launched hot properties in Gurgaon"
+
+        yield scrapy.FormRequest.from_response(
+            response,
+            formdata={'q': self.text,'start':str(self.page)},
+            callback=self.link_parse
+        )
+        # url = 'https://www.google.co.in/?gfe_rd=cr&ei=cUFiV5C4Lu-q8weqqI-oAQ&gws_rd=ssl#q=%s&start=%d' %(text,self.page)
+        # self.driver.get(url)
+        # try:
+        #     WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//h3//a')))
+        # except TimeoutException:
+        #     return
+        # resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
+        
+
+    
+    def link_parse(self, response):
+        urls = response.xpath('//h3//a/@href').extract()
         for url in urls :
             try :
-                yield scrapy.Request(url,callback = self.parse_page, dont_filter = True)
+                self.rank +=1
+                url = url.replace('/url?q=','')
+                request =  scrapy.Request(url,callback = self.parse_page, dont_filter = True)
+                request.meta['rank'] = str(self.rank)
+                yield request
             except:
                 pass
         self.page += 10
         if self.page != 60:
-            next_url = (resp.xpath('//tr[@valign="top"]/td/a/@href').extract())[-1]
-            next_url = urlparse.urljoin(self.start_urls[0],next_url)
-            yield scrapy.Request(next_url, callback = self.parse, dont_filter = True)
+            yield scrapy.FormRequest.from_response(
+                response,
+                formdata={'q': self.text,'start':str(self.page)},
+                callback=self.link_parse
+            )
 
     def filter(self, url):
-        banned = ['http://99acres.com/','http://commonfloor.com/','http://www.makaan.com/', 'http://www.affordablehomesindia.com/', 'http://www.magicbricks.com/', 'http://www.gurgaonnewlaunch.in/', 'http://www.gurgaonprojects.co.in/', 'http://www.godrejproperties.com/', 'http://www.commonfloor.com/', 'http://www.newprojectsingurgaon.in/', 'http://newlaunchgurgaon.in/', 'http://www.housing.com/', 'http://www.oneindiabullsgurgaon.co.in/', 'http://www.tatalavida113.in/', 'http://www.assetbulls.com/', 'http://www.makaan.com/', 'http://supertechlimited.com/', 'http://thecentercourt.co.in/', 'http://www.saanverdante.com/', 'http://www.hometrust.in/', 'http://www.windchants.in/', 'http://www.quikr.com/', 'http://www.unistar.in/', 'http://www.indiabullsone09gurgaon.in/', 'http://www.proptiger.com/']
-        parsed_uri = urlparse.urlparse(url)
-        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        print domain
-        if str(domain) in banned:
-            return False
+        with open('query_data.csv','ab+') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['url'] == url:
+                    return False
         return True
+
 
     def parse_page(self, response):
         if self.filter(response.url):
+            city = self.city
+            date = (datetime.date.today()).isoformat()
+            rank = int(response.meta['rank'])
+            website = (response.url).split('/')[2]
             temp = {}
-            self.driver.get(response.url)
-            try:
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//img[@src]')))
-            except TimeoutException:
-                yield scrapy.Request(response.url, callback = self.parse_page)
-                return
-            resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
-            temp['p'] = ((('abcd'.join(resp.xpath('//p//text()').extract())).replace('\n','').replace('\t','')).encode('utf8')).split('abcd')
-            temp['a'] = resp.xpath('//a//text()').extract()
-            temp['span'] = resp.xpath('//span//text()').extract()
-            temp['h1'] = resp.xpath('//h1//text()').extract()
-            temp['h2'] = resp.xpath('//h2//text()').extract()
-            temp['h3'] = resp.xpath('//h3//text()').extract()
-            temp['h4'] = resp.xpath('//h4//text()').extract()
-            temp['h5'] = resp.xpath('//h5//text()').extract()
-            temp['h6'] = resp.xpath('//h6//text()').extract()
-            temp['title'] = resp.xpath('//title//text()').extract()
-            temp['meta'] = resp.xpath('//meta//text()').extract()
-            temp['li'] = resp.xpath('//li//text()').extract()
-            temp['img'] = resp.xpath('//img/@alt').extract()
-            temp['th'] = resp.xpath('//th//text()').extract()
-            temp['td'] = resp.xpath('//td//text()').extract() 
+            date_object = {}
+
+            # self.driver.get(response.url)
+            # try:
+            #     WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//img[@src]')))
+            # except TimeoutException:
+            #     yield scrapy.Request(response.url, callback = self.parse_page)
+            #     return
+            # resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
+            temp['p'] = ((('abcd'.join(response.xpath('//p//text()').extract())).replace('\n','').replace('\t','')).encode('utf8')).split('abcd')
+            temp['a'] = response.xpath('//a//text()').extract()
+            temp['span'] = response.xpath('//span//text()').extract()
+            temp['h1'] = response.xpath('//h1//text()').extract()
+            temp['h2'] = response.xpath('//h2//text()').extract()
+            temp['h3'] = response.xpath('//h3//text()').extract()
+            temp['h4'] = response.xpath('//h4//text()').extract()
+            temp['h5'] = response.xpath('//h5//text()').extract()
+            temp['h6'] = response.xpath('//h6//text()').extract()
+            temp['title'] = response.xpath('//title//text()').extract()
+            temp['meta'] = response.xpath('//meta//text()').extract()
+            temp['li'] = response.xpath('//li//text()').extract()
+            temp['img'] = response.xpath('//img/@alt').extract()
+            temp['th'] = response.xpath('//th//text()').extract()
+            temp['td'] = response.xpath('//td//text()').extract() 
 
             for item in temp:
                 try :
-                    temp[item] = (('abcd'.join(temp[item])).replace('\n','').replace('\t','').replace(',',' '))
+                    temp[item] = (' '.join(temp[item])).replace('\n','').replace('\t','').replace(',',' ').replace('\r','')
                     temp[item] = re.sub(' +',' ',temp[item])
-                    temp[item] = (''.join([i if ord(i) < 128 else '' for i in temp[item]])).encode('utf8').split('abcd')
 
                 except :
                     pass
-            temp['url'] = response.url
 
-            with open('query_data.csv','ab+') as csvfile:
-                fieldnames = ['url','p','a','span','h1','h2','h3','h4','h5','h6','title','meta','li','img','th','td']
-                writer = csv.DictWriter(csvfile, fieldnames)
-                reader = csv.DictReader(csvfile)
-                writer.writerow(temp)
 
+            date_object['link'] = response.url
+            date_object['rank'] = rank
+            date_object['website'] = website
+            date_object['content'] = temp
+
+            # with open('query_data.csv','ab+') as csvfile:
+            #     fieldnames = ['url','p','a','span','h1','h2','h3','h4','h5','h6','title','meta','li','img','th','td']
+            #     writer = csv.DictWriter(csvfile, fieldnames)
+            #     reader = csv.DictReader(csvfile)
+            #     writer.writerow(temp)
+
+            #firebase.get('/users', None)
+            
+            print (self.firebases).put('',"SearchURL/city/"+city+"/"+date+"/"+self.text+"/"+"url"+str(rank),date_object)
+            print "\n\n\n"
             yield temp
 
         
