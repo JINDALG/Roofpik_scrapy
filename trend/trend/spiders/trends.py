@@ -28,8 +28,7 @@ class Result(scrapy.Spider):
 
 
     def parse(self, response):
-        self.text= "Show me newly launched hot properties in Gurgaon"
-
+        self.text= "I am looking for a good spacious apartment for rent in the city".replace('?','')
         yield scrapy.FormRequest.from_response(
             response,
             formdata={'q': self.text,'start':str(self.page)},
@@ -109,6 +108,9 @@ class Result(scrapy.Spider):
                 try :
                     temp[item] = (' '.join(temp[item])).replace('\n','').replace('\t','').replace(',',' ').replace('\r','')
                     temp[item] = re.sub(' +',' ',temp[item])
+                    temp[item] = re.sub(r'[^\x00-\x7F]',' ', temp[item])
+                    temp[item] = temp[item].encode('utf8')
+
 
                 except :
                     pass
@@ -126,11 +128,10 @@ class Result(scrapy.Spider):
             #     writer.writerow(temp)
 
             #firebase.get('/users', None)
+            pprint(date_object)
             
-            print (self.firebases).put('',"SearchURL/city/"+city+"/"+date+"/"+self.text+"/"+"url"+str(rank),date_object)
-            print "\n\n\n"
+            print (self.firebases).put("/","SearchURL/city/"+city+"/"+date+"/"+self.text+"/"+"url"+str(rank),date_object)
             yield temp
-
         
         
 
