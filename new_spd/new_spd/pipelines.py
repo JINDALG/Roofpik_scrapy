@@ -6,25 +6,18 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from new_spd.DBHandler import DBHandler 
 from new_spd.DBCreater import create_db 
+import traceback
 
 class NewSpdPipeline(object):
-	def __init__(self):
-		self.dbh = DBHandler()
+    def __init__(self):
+    	self.dbh = DBHandler()
 
-	def process_item(self, item, spider):
-		# check thoroughly
-		print '\n\n\n\n\n\n', item['Question'] ,'\n\n\n\n\n\n' , item['Trends']
-
-		self.dbh.insert_into_questions(item['Question'])
-		self.dbh.insert_into_trends(item['Trends'])
-
-		self.dbh.insert_into_db(  item['Price'], item['PricePerUnit'], 
-        	item['Availability'], item['SuperBuiltupArea'], item['BuiltupArea'], 
-        	item['CarpetArea'], item['address'], item['Location'], 
-        	item['Washroom'], item['Description'], item['PostedBy'], 
-        	item['PostingDate'], item['ProjectName'], item['Bedrooms'], 
-        	item['Views'], item['Searched'], item['URL'], 
-        	item['PROPERTYCODE'], item['BookingAmount'], item['Deposit'], 
-        	item['GatedCommunity'], item['PowerBackup'], item['BookingINFO'],
-        	item['AdditionalRooms'], item['PropertyInfo'], item['maintainance'],
-        	item['Furnishing'], item['city'] )
+    def process_item(self, item, spider):
+        try :
+            self.dbh.insert_into_db(item['Price'],item['PricePerUnit'], item['SuperBuiltupArea'], 
+                item['CarpetArea'], item['address'], item['Location'], item['Washroom'], item['PostedBy'], 
+                item['PostingDate'], item['ProjectName'], item['Bedrooms'], item['URL'], item['maintainance'], 
+                item['city'], item['is_price_fixed'], item['website'] )
+        except :
+            print traceback.print_exc()
+            input()
