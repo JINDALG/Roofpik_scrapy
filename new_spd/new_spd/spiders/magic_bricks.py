@@ -4,6 +4,7 @@ from new_spd.items import NewSpdItem
 import start_url_magic
 from pprint import pprint
 import re
+from month import find_month
 
 class acres99Spider(scrapy.Spider):
     page = 1
@@ -36,222 +37,172 @@ class acres99Spider(scrapy.Spider):
         # this function scrpaes info off the property page using xpaths
         # try except is used to avoid crashing in case of missing fields
         item = NewSpdItem()
-        booking_info = ""
-        booking_price = main_amt = deposit = brokerage = views = searched = -1
-        gated = additional_rooms = flooring = power_backup = city = trending_table =property_code = ''
-        additional_rooms = flooring = power_backup = property_info_tags  =''
-        posted_by_details = posted_on_date = project_name = price_per_unit = availability = location = address = description =furnishing =  ''
-        area1 = area2 = area1unit = area2unit = ''
-        area = washroom = bedrooms = -1
-        price = -1.0
-        try:
-            area1 = ''.join(response.xpath('//div[@class="unitBlockArea"][1]/span[contains(@class,"fBold")]//text()').extract()).strip()
-        except:
-            pass
-
-        try:
-            area2 = ''.join(response.xpath('//div[@class="unitBlockArea"][2]/span[contains(@class,"fBold")]//text()').extract()).strip() + ' '
-        except:
-            pass
-
-        try:
-            area1unit = ''.join(response.xpath('//div[@class="unitBlockArea"][1]/div[contains(@id,"AreaUnit")]//text()').extract()).strip() + ' '
-        except:
-            pass
-
-        try:
-            area2unit = ''.join(response.xpath('//div[@class="unitBlockArea"][2]/div[contains(@id,"AreaUnit")]//text()').extract()).strip() 
-        except:
-            pass
-
-        superBuiltupArea = builtupArea = carpetArea = ''
-        try:
-            # area = ''.join((area1 + area2 + area3 + area4).replace(' ', '' ).split(':')).replace('\n', '').lower()
-            # area = area.replace('-', '').replace('.00', '').replace(',', '')
+        try :
+            maintainance = posted_by_details = posted_on_date = project_name  = location = address = city =""
+            carpet_area = super_built_area =  -1.0
+            washroom = bedrooms = -1
+            is_price_fixed = True
+            price = price_per_unit = -1.0
 
             try:
-                superBuiltupArea = area1.split()[0]
-                superBuiltupArea = map(int, re.findall('\d+', superBuiltupArea))[0]
-                superBuiltupArea = float(superBuiltupArea)
-                if "sqyrd" in area1unit:
-                    superBuiltupArea *= 9
+                super_built_area_unit = ''.join(response.xpath('//div[@id="coveredAreaUnit"]//text()').extract())
             except:
                 pass
 
-            # if (not 'superbuiltuparea' in area and 'builtuparea' in area):
-            #     builtupArea = area.split('builtuparea')[1]
-            #     builtupArea = map(int, re.findall('\d+', builtupArea))[0]
-
-            try :
-                carpetArea = area2.split()[0]
-                carpetArea = map(int, re.findall('\d+', carpetArea))[0]                
-                carpetArea = float(carpetArea)
-                if "sqyrd" in area2unit:
-                    carpetArea *= 9
-            except :
+            try:
+                carpet_area_unit = ''.join(response.xpath('//div[@id="carpetAreaUnit"]//text()').extract())
+            except:
                 pass
 
-        except:
-            pass
-        datalist = response.xpath("//div[@class='nMoreListData']/div[@class='nDataRow']")
-        for data in datalist:
+            try:
+                super_built_area = (''.join(response.xpath('//span[@id="coveredAreaDisplay"]//text()').extract())).replace(',','').replace('\n','')
+                super_built_area = float(re.findall('\d+', super_built_area)[0])
+                if "yrd" in super_built_area_unit:
+                    super_built_area *= 9
+            except:
+                super_built_area = -1.0
+
+            try:
+                carpet_area = (''.join(response.xpath('//span[@id="carpetAreaDisplay"]//text()').extract())).replace(',','').replace('\n','')
+                carpet_area = float(re.findall('\d+', carpet_area)[0])
+                if "yrd" in carpet_area_unit:
+                    carpet_area *= 9
+            except:
+                carpet_area = -1.0
+            
+
             try :
-                label = data.xpath('div[@class="dataLabel"]//text()').extract()[0]
-                if "Rent" in label:
+                datalist = response.xpath("//div[@class='nMoreListData']/div[@class='nDataRow']")
+                for data in datalist:
                     try :
-                        price = ((data.xpath('div[@class="dataVal"]/span[contains(@class,"fBold")]//text()').extract())[0].split())[-1].replace(',','').lower()
-                        price = float(''.join(ele for ele in price if ele.isdigit() or ele == '.'))
-                    except:
-                        pass
+                        label = data.xpath('div[@class="dataLabel"]//text()').extract()[0]
+                        if "Rent" in label:
+                            try :
+                                price = ((data.xpath('div[@class="dataVal"]/span[contains(@class,"fBold")]//text()').extract())[0].split())[-1].replace(',','').lower()
+                                price = float(''.join(ele for ele in price if ele.isdigit() or ele == '.'))
+                            except:
+                                price = -1.0
 
-                    try:
-                        price_per_unit = ((data.xpath('div[@class="dataVal"]/span[@class="light"]/text()').extract())[1].split())[1]
-                        priceunit = ((data.xpath('div[@class="dataVal"]/span[@class="light"]//text()').extract())[1].split())[3].strip()
-                        price_per_unit = float(''.join(ele for ele in price_per_unit if ele.isdigit() or ele == '.'))
-                        if "sqyrd" in priceunit:
-                            price_per_unit *= 9
-                        price_per_unit = str(price_per_unit)
-                        
-                    except:
-                        pass
+                            try:
+                                price_per_unit = ((data.xpath('div[@class="dataVal"]/span[@class="light"]/text()').extract())[1].split())[1]
+                                priceunit = ((data.xpath('div[@class="dataVal"]/span[@class="light"]//text()').extract())[1].split())[3].strip()
+                                price_per_unit = float(''.join(ele for ele in price_per_unit if ele.isdigit() or ele == '.'))
+                                if "sqyrd" in priceunit:
+                                    price_per_unit *= 9
+                                
+                            except:
+                                price_per_unit = -1.0
 
-                    try :
-                        booking_info = ''.join(data.xpath('div[@class="dataVal"]/div//text()').extract()).replace('\n',' ')
-                        booking_info  = (''.join([i if ord(i) < 128 else ' ' for i in booking_info])).strip()
+                        if "Address" in label:
+                            try :
+                                address = ''.join(data.xpath('div[@class="dataVal"]/text()').extract()).replace('\n','')
+                            except:
+                                pass
+
                     except :
                         pass
+            except :
+                pass
+            try :
+                location = ''.join(response.xpath('//span[@itemprop="streetAddress"]//text()').extract()).replace(',',' ')
+            except :
+                pass
 
-                if "Tenants" in label:
+            try:
+                city = ''.join(response.xpath('//span[@itemprop="addressLocality"]//text()').extract()).replace(',',' ')
+            except:
+                pass
+            
+            try :
+                if address == '':
+                    address = location + city
+            except :
+                pass
+
+            try :
+                datalist = response.xpath('//div[@class="nInfoDataBlock"]/div[@class="nDataRow"]')
+                for data in datalist:
                     try :
-                        availability = ''.join(data.xpath('div[@class="dataVal"]//text()').extract()).replace('\n','')
+                        label = ''.join(data.xpath('div[@class="dataLabel"]//text()').extract())
+                        if "Configuration" in label :
+                            try :
+                                bedrooms = int(((data.xpath('div[@class="dataVal"]/span//text()').extract())[0].split())[0])
+                            except :
+                                pass
+                            try :
+                                other = ''.join(data.xpath('div[@class="dataVal"]/text()').extract()).split(",")
+                                
+                                for info in other:
+                                    try :
+                                        info  = info.replace('\n',' ')
+                                        if "Bathroom" in info:
+                                            info = (info.strip().split())[0]
+                                            washroom = int(info)
+                                    except :
+                                        pass
+                            except:
+                                pass
                     except:
                         pass
+            except :
+                pass
 
-                if "Address" in label:
-                    try :
-                        address = ''.join(data.xpath('div[@class="dataVal"]//text()').extract()).replace('\n','')
-                    except:
-                        pass
+            try:
+                posted_on_date = ((((response.xpath('//div[@class="propIDnPDate"]//text()').extract())[0].split('|'))[1]).split(':'))[1]
+                posted_on_date = posted_on_date.replace(',',' ').replace('\'',' ')
+                posted_on_date = re.sub(' +',' ',posted_on_date) 
+                posted_on_date = posted_on_date.split()
+                posted_on_date[0],posted_on_date[1] = posted_on_date[1],posted_on_date[0]
+                posted_on_date[1] = find_month(posted_on_date[1])  
+                posted_on_date[0] += "0" if len(posted_on_date) == 1 else ""
+                posted_on_date  = '-'.join(posted_on_date[::-1])
+            except:
+                pass
 
-                if "Electricity" in label:
-                    try :
-                        power_backup = ''.join(data.xpath('div[@class="dataVal"]//text()').extract()).strip()
-                    except:
-                        pass
+
+            try :
+                project_name = (''.join(response.xpath('//div[@class="nProjNmLoc"]/a//text()').extract())).replace('\n','')
 
             except :
                 pass
 
-        try :
-            location = ''.join(response.xpath('//span[@itemprop="streetAddress"]//text()').extract()).replace(',',' ')
+            try:
+                posted_by_details = ''.join(response.xpath('//a[contains(@id,"agentBtn")]//text()').extract()[0]).replace('Contact ','') # Remove 'Contact'
+                
+            except:
+                pass
+            try :
+                item['URL'] = response.url
+                item['website']  = (response.url).split('/')[2]
+                item['Price'] = price
+                item['PricePerUnit'] = price_per_unit
+                item['maintainance'] = maintainance.encode('utf8')
+                item['is_price_fixed'] = is_price_fixed
+            
+                item['SuperBuiltupArea'] = super_built_area
+                item['CarpetArea'] = carpet_area
+
+                item['city'] = city.encode('utf8')
+                item['address'] = address.encode('utf8')
+                item['Location'] = location.encode('utf8')
+                
+                item['Washroom'] = washroom
+                item['Bedrooms'] = bedrooms
+
+                item['PostedBy'] = posted_by_details.encode('utf8')
+                item['PostingDate'] = posted_on_date.encode('utf8')
+                item['ProjectName'] = project_name.encode('utf8')
+                
+                if project_name == '':
+                    print response.url
+                    print "\n\n\nproject name missing\n\n\n"
+                    yield
+                else :
+                    pprint(item)
+                    yield item
+            except :
+                print "error1"
+                yield            
         except :
-            pass
-
-        try:
-            city = ''.join(response.xpath('//span[@itemprop="addressLocality"]//text()').extract()).replace(',',' ')
-        except:
-            pass
-        
-
-        datalist = response.xpath('//div[@class="nInfoDataBlock"]/div[@class="nDataRow"]')
-        for data in datalist:
-            try :
-                label = ''.join(data.xpath('div[@class="dataLabel"]//text()').extract())
-                if "Configuration" in label :
-                    try :
-                        bedrooms = int(((data.xpath('div[@class="dataVal"]/span//text()').extract())[0].split())[0])
-                    except :
-                        pass
-                    try :
-                        other = ''.join(data.xpath('div[@class="dataVal"]/text()').extract()).split(",")
-                        
-                        for info in other:
-                            info  = info.replace('\n',' ')
-                            if "Bathroom" in info:
-                                info = (info.strip().split())[0]
-                                washroom = int(info)
-                            if "Room" in info:
-                                additional_rooms = info.strip()
-                    except:
-                        pass
-
-                if "Furnish" in label:
-                    try :
-                        furnishing = ''.join(data.xpath('div[@class="dataVal"]//text()').extract()).strip()
-                    except :
-                        pass
-
-            except:
-                pass
-
-
-        try:
-            description = ''.join(response.xpath("//span[@class='dDetail']//text()").extract()).replace('\n','')
-        except:
-            pass
-
-        if description == "":
-            try :
-                description = ''.join(response.xpath("//div[@class='nAboutBrf']//text()").extract())
-            except :
-                pass
-        
-        try:
-            posted_on_date = ((((response.xpath('//div[@class="propIDnPDate"]//text()').extract())[0].split('|'))[1]).split(':'))[1].strip()
-        except:
-            pass
-
-        try:
-            property_code = (((response.xpath('//div[@class="propIDnPDate"][1]//text()').extract())[0].split("|"))[0].split(":"))[1].strip()
-            
-        except:
-            pass    
-
-        try:
-            posted_by_details = response.xpath('//div[@class="agntName"]//text()').extract()[-1] # Remove 'Contact'
-            
-        except:
-            pass
-
-        questions = []
-        
-        item['Price'] = price
-        item['PricePerUnit'] = price_per_unit.encode('utf8')
-
-        item['Availability'] = availability.encode('utf8')
-        item['SuperBuiltupArea'] = superBuiltupArea
-        item['BuiltupArea'] = builtupArea
-        item['CarpetArea'] = carpetArea
-
-        item['city'] = city.encode('utf8')
-        item['address'] = address.encode('utf8')
-        item['Location'] = location.encode('utf8')
-        
-        item['Washroom'] = washroom
-        item['Description'] = description.encode('utf8')
-
-        item['PostedBy'] = posted_by_details.encode('utf8')
-        item['PostingDate'] = posted_on_date.encode('utf8')
-        item['ProjectName'] = project_name.encode('utf8')
-
-        item['Bedrooms'] = bedrooms
-        item['Views'] = views
-        item['Searched'] = searched
-        item['URL'] = response.url.encode('utf8')
-            
-        item['Question'] = ('__'.join(questions)).encode('utf8')
-
-        item['Trends'] = trending_table.encode('utf8')
-        item['PROPERTYCODE'] = property_code.encode('utf8')
-        item['BookingAmount'] = booking_price
-        item['Deposit'] = deposit
-        item['GatedCommunity'] = gated.encode('utf8')
-        item['PowerBackup'] = power_backup.encode('utf8')
-
-        item['BookingINFO'] = booking_info.encode('utf8')
-        item['AdditionalRooms'] = additional_rooms.encode('utf8')
-
-        item['PropertyInfo'] = property_info_tags.encode('utf8')
-        item['maintainance'] = main_amt
-        item['Furnishing'] = furnishing.encode('utf8')
-        yield item
+            print "error2"
+            yield
