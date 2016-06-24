@@ -254,22 +254,4 @@ class acres99Spider(scrapy.Spider):
         item['PropertyInfo'] = property_info_tags.encode('utf8')
         item['maintainance'] = main_amt
         item['Furnishing'] = furnishing.encode('utf8')
-        # item_temp =  {
-        #     'Price' : price, 'PricePerUnit' : price_per_unit.encode('utf8'), 'Availability' : availability,
-        #     'SuperBuiltupArea' : superBuiltupArea, 'BuiltupArea': builtupArea, 'CarpetArea': carpetArea,
-        #     'address': address, 'Location' : location, 'Washroom' : washroom, 'Description' : description,
-        #     'PostedBy': posted_by_details, 'PostingDate' : posted_on_date, 'ProjectName' : project_name,
-        #     'Bedrooms': bedrooms,  
-        #     'Views' : views,'Searched' : searched, 'URL' : response.url,
-        #     'Question' : questions,
-        #     #'Trends': trending_table,
-        #     'PROPERTYCODE' : property_code,'BookingAmount' : booking_price, 'Deposit': deposit, 
-        #     'GatedCommunity' : gated, 'PowerBackup' : power_backup,
-        #     'BookingINFO': booking_info, 'AdditionalRooms': additional_rooms,
-        #     'PropertyInfo' : property_info_tags,'maintainance': main_amt,
-        #     'Furnishing' : furnishing
-        # }
-
-        #print '\n\n\n\n\n\n', trending_table , '\n\n\n\n\n\n\n\n'
-        #for key in item:    if(item[key] == ''):        item[key] = None
         yield item
