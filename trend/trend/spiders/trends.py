@@ -9,13 +9,10 @@ from multiprocessing import Process
 
 
 class Result(scrapy.Spider):
-    rank = 0
     name = "trends"
-    city = "Gurgaon"
-    text = None
+    city = "Mumbai"
     allowed_domains = ['google.co.in']
     start_urls = ['https://www.google.co.in']
-    page = 0
     def __init__(self, filename=None):
         self.firebases = firebase.FirebaseApplication("https://trends-4b774.firebaseio.com/", None)
         pass
@@ -28,12 +25,17 @@ class Result(scrapy.Spider):
 
 
     def parse(self, response):
-        self.text= "I am looking for a good spacious apartment for rent in the city".replace('?','')
-        yield scrapy.FormRequest.from_response(
-            response,
-            formdata={'q': self.text,'start':str(self.page)},
-            callback=self.link_parse
-        )
+        query_list = (self.firebases).get('/searchQuery/city', None)
+        query_list = query_list.values()
+        for query in query_list:
+            query = query['name'].encode('utf8')
+            text= query %(self.city)
+            text = text.replace("?",'').replace('.','')
+            yield scrapy.FormRequest.from_response(
+                response,
+                formdata={'q': text,'start':str(0)},
+                callback=self.link_parse
+            )
         # url = 'https://www.google.co.in/?gfe_rd=cr&ei=cUFiV5C4Lu-q8weqqI-oAQ&gws_rd=ssl#q=%s&start=%d' %(text,self.page)
         # self.driver.get(url)
         # try:
@@ -43,23 +45,31 @@ class Result(scrapy.Spider):
         # resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8');
         
 
-    
+        
     def link_parse(self, response):
+        page = int((response.url).split('=')[-1])
+        page += 10
+        text = response.xpath('//input[@name="q"]/@value').extract()
+        text = text[0].encode('utf8')
         urls = response.xpath('//h3//a/@href').extract()
         for url in urls :
             try :
-                self.rank +=1
+                try :
+                    rank = page - 10 + urls.index(url)
+                except :
+                    rank = 0
+                rank += 1
                 url = url.replace('/url?q=','')
                 request =  scrapy.Request(url,callback = self.parse_page, dont_filter = True)
-                request.meta['rank'] = str(self.rank)
+                request.meta['rank'] = rank
+                request.meta['text'] = text
                 yield request
             except:
                 pass
-        self.page += 10
-        if self.page != 60:
+        if page != 60:
             yield scrapy.FormRequest.from_response(
                 response,
-                formdata={'q': self.text,'start':str(self.page)},
+                formdata={'q': text,'start':str(page)},
                 callback=self.link_parse
             )
 
@@ -130,7 +140,7 @@ class Result(scrapy.Spider):
             #firebase.get('/users', None)
             pprint(date_object)
             
-            print (self.firebases).put("/","SearchURL/city/"+city+"/"+date+"/"+self.text+"/"+"url"+str(rank),date_object)
+            print (self.firebases).put("/","SearchURL/city/"+city+"/"+date+"/"+response.meta['text']+"/"+"url"+str(rank),date_object)
             yield temp
         
         

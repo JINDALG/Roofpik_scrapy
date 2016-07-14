@@ -9,7 +9,7 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'trend'
+BOT_NAME = 'trenda'
 
 SPIDER_MODULES = ['trend.spiders']
 NEWSPIDER_MODULE = 'trend.spiders'
@@ -36,10 +36,10 @@ CONCURRENT_REQUESTS=32
 #TELNETCONSOLE_ENABLED=False
 
 # Override the default request headers:
-DEFAULT_REQUEST_HEADERS = {
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'en',
-}
+# DEFAULT_REQUEST_HEADERS = {
+#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#   'Accept-Language': 'en',
+# }
 
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
@@ -47,6 +47,28 @@ SPIDER_MIDDLEWARES = {
    # 'trend.middlewares.MyCustomSpiderMiddleware': 543,
    'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': None,
 }
+
+#DOWNLOADER_MIDDLEWARES = {
+#    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+#    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+#}
+
+#HTTP_PROXY = 'http://127.0.0.1:8123'
+#DOWNLOADER_MIDDLEWARES = {
+  #Tor Middleware
+#  'trend.middlewares.ProxyMiddleware': 400
+#}
+
+DOWNLOADER_MIDDLEWARES = {
+     # 'trend.middlewares.RandomUserAgentMiddleware': 400,
+     # 'trend.middlewares.ProxyMiddleware': 410,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'random_useragent.RandomUserAgentMiddleware': 400
+
+    # Disable compression middleware, so the actual HTML pages are cached
+}
+
+USER_AGENT_LIST = "/home/shivji/roofpik/scrapy/trend/trend/useragents.txt"
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
