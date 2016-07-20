@@ -1,0 +1,324 @@
+{
+  "versionCreatedTime": "",
+  "versionEndTime": "",
+  "rwa": {
+    "rules": "",
+    "contactNumber": "",
+    "emailAddress": "",
+    "contactName": ""
+  },
+  "projectStatus": "Ready to move",
+  "costing": {
+    "cleaningUtensilsTwoTime": "",
+    "cleaningUtensilsOneTime": "",
+    "maintenanceChargesFixed": "",
+    "maintenanceChargesVariable": "",
+    "cookingChargeOneMeal": "",
+    "powerBackupCharges": "",
+    "maid24Hours": "",
+    "carWashCharges": "",
+    "maid12Hours": "",
+    "moveInCharges": "",
+    "moveOutCharges": "",
+    "cookingChargeTwoMeals": ""
+  },
+  "ratings": {
+    "average": 3.2,
+    "number": 67
+  },
+  "projectDetails": {
+    "visitorCarParking": "",
+    "approvedBankLoans": {
+      "AxisBank": "",
+      "HDFC": ""
+    },
+    "projectType": {
+      "rowHouse": false,
+      "servicedApartment": false,
+      "apartment": false,
+      "studio": false,
+      "villa": false
+    },
+    "partners": {
+      "architect": {
+        "website": "",
+        "name": ""
+      },
+      "landscapeDesigner": {
+        "website": "",
+        "name": ""
+      },
+      "constructionCompany": {
+        "website": "",
+        "name": ""
+      }
+    },
+    "floors": {
+      "max": "15",
+      "min": "15"
+    },
+    "builderId": "",
+    "projectName": "Vipul Greens",
+    "builderName": "Vipul Group Builders",
+    "greenArea": "",
+    "carParking": "",
+    "address": {
+      "address_line2": "",
+      "address_line1": "Sector-48 Gurgaon City : Gurgaon",
+      "zone": "",
+      "cityName": "",
+      "locations": {
+        "locationId": {
+          "locationName": "",
+          "locationId": ""
+        }
+      },
+      "zoneId": "",
+      "cityId": "",
+      "lat": "",
+      "placeId": "",
+      "landmark": "",
+      "lng": "",
+      "pincode": ""
+    },
+    "totalTowers": "23",
+    "landArea": "",
+    "vastuCompliant": "",
+    "lifts": {
+      "max": "",
+      "min": ""
+    },
+    "totalUnits": "644"
+  },
+  "other": {
+    "powerBackup": "",
+    "laundry": "",
+    "daycare": "",
+    "wheelchairFriendly": "",
+    "park": "",
+    "atm": "",
+    "parlour": "",
+    "petFriendly": "",
+    "pharmacy": "",
+    "airConditioningInWaitingLounge": "",
+    "maintenance": "",
+    "playSchool": "",
+    "bank": "",
+    "waitingLoungeInTower": "",
+    "grocery": ""
+  },
+  "priceRange": {
+    "buy": {
+      "resale": {
+        "max": 0,
+        "min": 0
+      },
+      "booking": {
+        "max": 0,
+        "min":0
+      }
+    },
+    "rent": {
+      "max": 0,
+      "average": 0,
+      "min": 0
+    }
+  },
+  "version": "",
+  "units": {
+  },
+  "clubHouse": {
+    "steamRoom": "",
+    "salon": "",
+    "cafe": "",
+    "bar": "",
+    "musicRoom": "",
+    "aerobicsRooms": "",
+    "yogaRoom": "",
+    "gym": "",
+    "restaurant": "",
+    "saunaRoom": "",
+    "miniTheatre": "",
+    "jacuzzi": "",
+    "kidsZone": "",
+    "spa": "",
+    "videoGames": "",
+    "danceRoom": "",
+    "multiPurposeHall": "",
+    "operatingTimes": {
+      "start": "",
+      "holiday": "",
+      "end": ""
+    },
+    "guestrooms": "",
+    "businessCentre": ""
+  },
+  "status": "Ready to move",
+  "ranking": {
+    "score": 0.9876
+  },
+  "buy": "",
+  "societyShops": {
+    "grocery": {
+      "contact": "",
+      "name": ""
+    },
+    "parlour": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "pharmacy": {
+      "contact": "",
+      "name": ""
+    }
+  },
+  "connectivity": {
+    "autoStand": {
+      "lat": "",
+      "distance": "",
+      "long": ""
+    },
+    "expresswayDistance": "",
+    "railwayStation": {
+      "lat": "",
+      "distance": "",
+      "offpeakTime": "",
+      "peakTime": "",
+      "long": ""
+    },
+    "nearestMainRoad": "",
+    "cabStand": {
+      "lat": "",
+      "distance": "",
+      "long": ""
+    },
+    "airport": {
+      "lat": "",
+      "distance": "",
+      "offpeakTime": "",
+      "peakTime": "",
+      "long": ""
+    },
+    "mainRoadDistance": "",
+    "nearestExpressway": "",
+    "metroStation": {
+      "lat": "",
+      "distance": "",
+      "offpeakTime": "",
+      "peakTime": "",
+      "long": ""
+    },
+    "busStand": {
+      "lat": "",
+      "distance": "",
+      "offpeakTime": "",
+      "peakTime": "",
+      "long": ""
+    }
+  },
+  "areas": {
+    "max": 0,
+    "pricePerSquareFeet": "",
+    "min": 0
+  },
+  "homeDelivery": {
+    "grocery": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "laundry": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "restaurant": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "isp": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "parlour": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "pharmacy": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "milkman": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "newspaperDelivery": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    },
+    "cableProvider": {
+      "id1": {
+        "contact": "",
+        "name": ""
+      }
+    }
+  },
+  "sportsActivities": {
+    "kidsPlayAreas": false,
+    "cricket": true,
+    "football": true,
+    "joggingTrack": false,
+    "badminton": true,
+    "amphitheatre": false,
+    "tennis": true,
+    "kidsSwimmingPool": false,
+    "multiPurposeCourt": false,
+    "skatingRink": false,
+    "squash": false,
+    "tableTennis": false,
+    "basketball": false,
+    "volleyball": false,
+    "snookerTable": false,
+    "bowlingAlley": false,
+    "poolTable": false,
+    "pitchAndPutt": false,
+    "swimmingPool": false
+  },
+  "versionLiveTime": "",
+  "security": {
+    "videoDoorPhone": "",
+    "mainGate": {
+      "guards": "",
+      "intercom": "",
+      "cctv": "",
+      "boomBarriers": ""
+    },
+    "workerClearance": "",
+    "numberOfEntryOrExitPoints": "",
+    "workerPass": "",
+    "stickersForVehicles": "",
+    "tagsForVehicles": "",
+    "tower": {
+      "accessControlled": "",
+      "guard": "",
+      "cctv": ""
+    }
+  },
+  "versionCreatedBy": ""
+}

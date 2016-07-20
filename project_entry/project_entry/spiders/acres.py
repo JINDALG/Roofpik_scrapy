@@ -1,6 +1,7 @@
 import scrapy 
 from pprint import pprint
 import re
+import traceback
 from selenium import webdriver
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy.http import TextResponse
@@ -11,13 +12,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from firebase import firebase
+import os
+from read_json_acres import convert
 
 class acres99(scrapy.Spider):
 	name = "99acres"
 	allowed_domains = ["99acres.com"]   # target site
 	start_urls = None
 	def __init__(self, filename=None):
-		with open('link.txt','r') as f:
+		with open(os.path.dirname(__file__) + '/../../link.txt','r') as f:
 			self.start_urls = [f.read()]
 		self.driver = webdriver.Chrome()
 		dispatcher.connect(self.spider_closed, signals.spider_closed)
@@ -28,7 +31,7 @@ class acres99(scrapy.Spider):
 	def parse(self,response):
 		item = {}
 		min_booking_price = min_area = max_booking_price = max_area = area = max_resale_price = min_resale_price= -1
-		status = apartment_type = apartment_bhk = project_detail= builderName= "" 
+		status = apartment_type = apartment_bhk = project_detail= builderName= address ="" 
 		superBuiltupArea = builtupArea = min_book_price = max_book_price = min_sale_price = max_sale_price = bhk = -1
 		try :
 			name = ''.join(response.xpath('//div[@class="bannerOver"]//span[@itemprop="name"]//text()').extract())
@@ -44,7 +47,7 @@ class acres99(scrapy.Spider):
 						status =' '.join(fact.xpath('div[contains(@class,"factData")]//div[contains(@class,"factVal1")]//text()').extract())
 					
 					if "Address" in head:
-						addres =' '.join(fact.xpath('div[contains(@class,"factData")]//div[contains(@class,"factVal")]//text()').extract())
+						address =' '.join(fact.xpath('div[contains(@class,"factData")]//div[contains(@class,"factVal")]//text()').extract())
 				
 					if "Configuration" in head:
 						apartment_type =''.join(fact.xpath('div[contains(@class,"factData")]//div[contains(@class,"factVal1")]//text()').extract())
@@ -198,12 +201,17 @@ class acres99(scrapy.Spider):
 		item['min_resale_price'] = min_resale_price
 		item['max_resale_price'] = max_resale_price
 		item['amenity'] = amenity
-		item['address'] = addres.encode('utf8')
+		item['address'] = address.encode('utf8')
 		item['units'] = det
 		item['website']  = (response.url).split('/')[2].split('.')[1]
 		item['project_detail'] = project_detail.encode('utf8')
 		item['builderName'] = builderName.encode('utf-8')
 
+		try :
+			item = convert(item)
+		except :
+			print traceback.print_exc()
+			item = {}
 		fire = firebase.FirebaseApplication('https://abcapp-8345a.firebaseio.com/',None)
-		print fire.put('/','temp',item)
+		fire.put('/','temp',item)
 		return
