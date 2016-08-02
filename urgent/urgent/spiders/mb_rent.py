@@ -27,8 +27,7 @@ class magicbricks(scrapy.Spider):
 		self.display.start()
 		self.driver = webdriver.Chrome()
 		dispatcher.connect(self.spider_closed, signals.spider_closed)
-		with open('cus.txt','ab+') as f:
-			f.write("init complete")
+	
 
 	def spider_closed(self,spider):
 		self.driver.close()
@@ -36,26 +35,21 @@ class magicbricks(scrapy.Spider):
 		
 
 	def parse(self, response):
-		try :
-			with open('cus.txt','ab+') as f:
-				f.write("parse enter")			
+		try :		
 			self.driver.get(response.url)
-			with open('cus.txt','ab+') as f:
-				f.write("url load")
 			resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8')
 			blocks = resp.xpath('//div[contains(@id,"resultBlockWrapper")]')
 			old = 0
 			new = len(blocks)
 			while old != new:
-				print "\n\n\n",old,new,"\n\n\n"
+				print old,new
 				self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 				time.sleep(3)
 				resp = TextResponse(url=self.driver.current_url, body=self.driver.page_source, encoding='utf-8')
 				blocks = resp.xpath('//div[contains(@id,"resultBlockWrapper")]')
 				old = new
 				new = len(blocks)
-			with open('cus.txt','ab+') as f:
-				f.write("scrolling complete")
+
 			for block in blocks:
 				try :
 					price = ''.join(block.xpath('div//div[@class="srpColm2"]//span[contains(@id,"pricePropertyVal")]//text()').extract())
@@ -67,7 +61,7 @@ class magicbricks(scrapy.Spider):
 					price *= 100000 if islac else 1
 					bhk = ''.join(block.xpath('div//div[@class="srpColm2"]//strong/text()').extract())
 					bhk = (''.join(bhk.split()[:2])).replace('.5','')
-					if "bhk" in bhk.lower():
+					if "bhk" in bhk.lower() and not("1bhk" in bhk.lower() or ('1 bhk') in bhk.lower()) :
 						ppf = ''.join(block.xpath('div//div[@class="srpColm2"]//span[@class="proRentArea"]/text()').extract())
 						if ppf == "":
 							ppf = ''.join(block.xpath('div//div[@class="srpColm2"]//span[@class="proNameSizeTxt"]/text()').extract())
@@ -81,12 +75,8 @@ class magicbricks(scrapy.Spider):
 							self.obj[bhk] = {'min':price, 'max':price, 'count':1,'avg':ppf}
 				except :
 					pass
-			with open('cus.txt','ab+') as f:
-				f.write("data mined")
 			with open(os.path.dirname(__file__) +'/../../price.json','w')as file:
 				file.write(json.dumps(self.obj))
-			with open('cus.txt','ab+') as f:
-				f.write("data wrote in file")
 			return
 		except :
 			with open('cus.txt','ab+') as f:

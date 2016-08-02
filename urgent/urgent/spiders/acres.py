@@ -39,7 +39,7 @@ class acres99Spider(scrapy.Spider):
                     price = int(price)
                     bhk = ''.join(entry.xpath('div[@class="wrapttl"]/div[1]/a//text()').extract())
                     bhk = bhk.split(',')[0].replace('.5','')
-                    if "bhk" in bhk or "BHK" in bhk:
+                    if "bhk" in bhk.lower() and not("1bhk" in bhk.lower() or ('1 bhk') in bhk.lower()) : 
                         ppf = ''.join(entry.xpath('div[@class="srpDetail"]//div[@class="srpDataWrap"]/span[1]/b[1]//text()').extract())
                         ppf = float(ppf.split()[0])
                         ppf = price/ppf

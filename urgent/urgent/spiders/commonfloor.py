@@ -52,7 +52,7 @@ class commonfl(scrapy.Spider):
 				price *= 100000 if islac else 1
 				bhk = ''.join(box.xpath('div[2]/div[1]/div/div/h4/a/span[1]/text()').extract())
 				bhk = bhk.split()[0].replace('.5','')
-				if "bhk" in bhk.lower():
+				if ("bhk" in bhk.lower()) and not("1bhk" in bhk.lower() or ('1 bhk') in bhk.lower()) :
 					ppf = ''.join(box.xpath('div[2]/div[2]/div/div[2]/div[2]/p/text()').extract())
 					ppf = float(ppf)
 					ppf = price/ppf
@@ -91,7 +91,7 @@ class commonfl(scrapy.Spider):
 					price *= 100000 if islac else 1
 					bhk = ''.join(box.xpath('div[2]/div[1]/div/div/h4/a/span[1]/text()').extract())
 					bhk = bhk.split()[0].replace('.5','')
-					if "bhk" in bhk.lower():
+					if "bhk" in bhk.lower() and not("1bhk" in bhk.lower() or ('1 bhk') in bhk.lower()) :
 						ppf = ''.join(box.xpath('div[2]/div[2]/div/div[2]/div[2]/p/text()').extract())
 						ppf = float(ppf)
 						ppf = price/ppf
